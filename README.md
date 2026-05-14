@@ -75,7 +75,6 @@ The backend follows modern enterprise backend architecture and production-ready 
 | Build Tool | Maven |
 | API Testing | Postman |
 | Documentation | Swagger/OpenAPI |
-| Deployment | Docker |
 
 ---
 
