@@ -9,10 +9,14 @@ services:
       POSTGRES_PASSWORD: vishal
 
   hospital:
-    image: vishal7102002/hospital:v1
+    image: hospital:v1
     container_name: hospital
     ports:
       - "8080:8080"
+
+    env_file:
+      - .env
+
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://hospitaldb:5432/hospitaldb
       SPRING_DATASOURCE_USERNAME: postgres
@@ -25,6 +29,7 @@ services:
 
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+
     deploy:
       resources:
         limits:
