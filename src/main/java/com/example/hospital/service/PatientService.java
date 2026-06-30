@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +61,9 @@ public class PatientService {
 
     @Transactional
     public ResponsePatientDto getPatientById(Long id) {
-        Patient patient = patientRepository.findByUId(id);
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
+
         return patientMapper.toDto(patient);
     }
 }

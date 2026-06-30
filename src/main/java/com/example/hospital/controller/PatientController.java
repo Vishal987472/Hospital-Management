@@ -33,13 +33,13 @@ public class PatientController {
         return ResponseEntity.ok().body(patients);
     }
 
-    @GetMapping
-    public ResponseEntity<ResponsePatientDto> getPatientById(@RequestParam Long id){
+    @GetMapping("id/{id}")
+    public ResponseEntity<ResponsePatientDto> getPatientById(@PathVariable Long id){
         ResponsePatientDto patient = patientService.getPatientById(id);
         return ResponseEntity.ok().body(patient);
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("username/{username}")
     @PreAuthorize("hasRole('PATIENT') and #username == authentication.name")
     public ResponseEntity<ResponsePatientDto> getPatientById(@PathVariable String username){
         ResponsePatientDto patient = patientService.getPatient(username);
