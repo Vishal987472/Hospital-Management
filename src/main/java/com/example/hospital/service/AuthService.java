@@ -9,7 +9,9 @@ import com.example.hospital.entity.provider.AuthProviderType;
 import com.example.hospital.entity.role.Role;
 import com.example.hospital.mapper.UserMapper;
 import com.example.hospital.repository.UserRepository;
+import com.example.hospital.security.CookieUtil;
 import com.example.hospital.security.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +35,9 @@ public class AuthService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final JwtUtil jwtUtil;
+    private final CookieUtil cookieUtil;
 
-    public ResponseUserDto login(LoginDto loginDto) {
+    public ResponseUserDto login(LoginDto loginDto,  HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDto.getName(),
@@ -50,9 +53,17 @@ public class AuthService {
         User user = userRepository.findByName(securityUser.getUsername())
                 .orElseThrow();
 
-        ResponseUserDto response = userMapper.userToUserDto(user);
-        response.setToken(token);
-        return response;
+        cookieUtil.create(response, token);
+        return userMapper.userToUserDto(user);
+    }
+
+    public ResponseUserDto getCurrentUser(Authentication authentication) {
+
+        User user = userRepository
+                .findByName(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return userMapper.userToUserDto(user);
     }
 
     public User signupInternal(UserDto userDto,
