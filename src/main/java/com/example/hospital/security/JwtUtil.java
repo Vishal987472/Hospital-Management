@@ -1,6 +1,7 @@
 package com.example.hospital.security;
 
 import com.example.hospital.entity.provider.AuthProviderType;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,32 +27,43 @@ public class JwtUtil {
 
     }
 
-    public String extractUsername(String token){
-        return Jwts.parserBuilder()
-                .setSigningKey(secret)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+    public String extractUsername(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(secret)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (JwtException e) {
+            return null;
+        }
     }
 
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        Date expiration = extractExpiration(token);
+        return expiration == null || expiration.before(new Date());
     }
 
     private Date extractExpiration(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(secret)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getExpiration();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(secret)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getExpiration();
+        } catch (JwtException e) {
+            return null;
+        }
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
+
         String username = extractUsername(token);
 
-        return username.equals(userDetails.getUsername())
+        return username != null
+                && username.equals(userDetails.getUsername())
                 && !isTokenExpired(token);
     }
 
